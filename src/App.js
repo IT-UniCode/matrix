@@ -25,15 +25,17 @@ function App() {
     selected: false,
   });
 
-  const fillCells = (overCol, selectedCol = extremeValues.down) => {
+  const fillCells = (overCol) => {
     const copyMatrix = [...matrix];
-
+    const selectedCol = extremeValues.down;
+    
     if (selectedCol.y === overCol.y && selectedCol.x === overCol.x) {
       copyMatrix[overCol.y][overCol.x].checked = !copyMatrix[overCol.y][
         overCol.x
       ].checked;
     } else {
       copyMatrix.forEach((row, rowIndex) => {
+
         if (rowIndex >= selectedCol.y && rowIndex <= overCol.y) {
           row.forEach((_, colIndex) => {
             if (colIndex >= selectedCol.x && colIndex <= overCol.x) {

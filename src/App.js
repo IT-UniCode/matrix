@@ -28,38 +28,57 @@ function App() {
   const fillCells = (overCol) => {
     const copyMatrix = [...matrix];
     const selectedCol = extremeValues.down;
-    
-    if (selectedCol.y === overCol.y && selectedCol.x === overCol.x) {
-      copyMatrix[overCol.y][overCol.x].checked = !copyMatrix[overCol.y][
-        overCol.x
-      ].checked;
-    } else {
-      copyMatrix.forEach((row, rowIndex) => {
+    const isClick = selectedCol.y === overCol.y && selectedCol.x === overCol.x;
 
-        if (rowIndex >= selectedCol.y && rowIndex <= overCol.y) {
-          row.forEach((_, colIndex) => {
-            if (colIndex >= selectedCol.x && colIndex <= overCol.x) {
-              copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
-            }
-            if (colIndex <= selectedCol.x && colIndex >= overCol.x) {
-              copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
-            }
-          });
+    isClick
+      ? (copyMatrix[overCol.y][overCol.x].checked = !copyMatrix[overCol.y][
+          overCol.x
+        ].checked)
+      : copyMatrix.forEach((row, rowIndex) => {
+          checkUnderCursor(rowIndex, overCol, selectedCol, row, copyMatrix);
+
+          checkAboveCursor(rowIndex, overCol, selectedCol, row, copyMatrix);
+        });
+
+    setMatrix(copyMatrix);
+  };
+
+  const checkUnderCursor = (
+    rowIndex,
+    overCol,
+    selectedCol,
+    row,
+    copyMatrix
+  ) => {
+    if (rowIndex <= overCol.y && rowIndex >= selectedCol.y) {
+      row.forEach((_, colIndex) => {
+        if (colIndex >= selectedCol.x && colIndex <= overCol.x) {
+          copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
         }
-
-        if (rowIndex >= overCol.y && rowIndex <= selectedCol.y) {
-          row.forEach((_, colIndex) => {
-            if (colIndex <= selectedCol.x && colIndex >= overCol.x) {
-              copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
-            }
-            if (colIndex >= selectedCol.x && colIndex <= overCol.x) {
-              copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
-            }
-          });
+        if (colIndex <= selectedCol.x && colIndex >= overCol.x) {
+          copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
         }
       });
     }
-    setMatrix(copyMatrix);
+  };
+
+  const checkAboveCursor = (
+    rowIndex,
+    overCol,
+    selectedCol,
+    row,
+    copyMatrix
+  ) => {
+    if (rowIndex >= overCol.y && rowIndex <= selectedCol.y) {
+      row.forEach((_, colIndex) => {
+        if (colIndex <= selectedCol.x && colIndex >= overCol.x) {
+          copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
+        }
+        if (colIndex >= selectedCol.x && colIndex <= overCol.x) {
+          copyMatrix[rowIndex][colIndex].checked = !selectedCol.checked;
+        }
+      });
+    }
   };
 
   return (
@@ -75,52 +94,55 @@ function App() {
           }
         }}
       >
-        {matrix.map((row) => (
-          <tr>
-            {row.map((col) => (
-              <td
-                onMouseOver={() => {
-                  if (extremeValues.selected) {
-                    fillCells(col);
-                  }
-                }}
-                onMouseDown={() => {
-                  setExtremeValues((prev) => ({
-                    ...prev,
-                    down: {
-                      x: col.x,
-                      y: col.y,
-                      checked: col.checked,
-                    },
-                    selected: true,
-                  }));
-                }}
-                onMouseUp={() => {
-                  setExtremeValues((prev) => ({
-                    ...prev,
-                    down: {
-                      x: 0,
-                      y: 0,
-                      checked: false,
-                    },
-                    selected: false,
-                  }));
+        <tbody>
+          {matrix.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((col, colIndex) => (
+                <td
+                  key={colIndex}
+                  onMouseOver={() => {
+                    if (extremeValues.selected) {
+                      fillCells(col);
+                    }
+                  }}
+                  onMouseDown={() => {
+                    setExtremeValues((prev) => ({
+                      ...prev,
+                      down: {
+                        x: col.x,
+                        y: col.y,
+                        checked: col.checked,
+                      },
+                      selected: true,
+                    }));
+                  }}
+                  onMouseUp={() => {
+                    setExtremeValues((prev) => ({
+                      ...prev,
+                      down: {
+                        x: 0,
+                        y: 0,
+                        checked: false,
+                      },
+                      selected: false,
+                    }));
 
-                  if (extremeValues.selected) {
-                    fillCells(col);
-                  }
-                }}
-                style={{
-                  border: '1px solid #000',
-                  width: '40px',
-                  height: '40px',
-                  backgroundColor: col.checked ? 'red' : '#FFF',
-                  userSelect: 'none',
-                }}
-              />
-            ))}
-          </tr>
-        ))}
+                    if (extremeValues.selected) {
+                      fillCells(col);
+                    }
+                  }}
+                  style={{
+                    border: '1px solid #000',
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: col.checked ? 'red' : '#FFF',
+                    userSelect: 'none',
+                  }}
+                />
+              ))}
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
